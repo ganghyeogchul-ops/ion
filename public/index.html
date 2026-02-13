@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이온 포럼 - Aion Community</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="/static/images/aion-logo.jpg" alt="AION" class="logo-image">
+                    <h1>AION FORUM</h1>
+                </div>
+                <nav class="main-nav">
+                    <ul id="main-nav-menu">
+                        <li><a href="index.html" class="active"><i class="fas fa-home"></i> 홈</a></li>
+                        <li><a href="board.html?type=free"><i class="fas fa-comments"></i> 자유게시판</a></li>
+                        <li><a href="board.html?type=trade"><i class="fas fa-exchange-alt"></i> 아이템 거래장터</a></li>
+                        <li><a href="board.html?type=admin_shop"><i class="fas fa-store"></i> 운영자 직거래장터</a></li>
+                        <li id="nav-auth">
+                            <a href="login.html"><i class="fas fa-sign-in-alt"></i> 로그인</a>
+                        </li>
+                        <li id="nav-register">
+                            <a href="register.html"><i class="fas fa-user-plus"></i> 회원가입</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 배너 -->
+    <section class="hero-banner">
+        <div class="hero-overlay">
+            <div class="container">
+                <h2 class="hero-title">아이온 포럼에 오신 것을 환영합니다</h2>
+                <p class="hero-subtitle">게임 정보 공유, 아이템 거래, 커뮤니티 활동을 즐겨보세요</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 새로고침 버튼 -->
+            <div style="text-align: right; margin-bottom: 20px;">
+                <button onclick="refreshAllBoards()" style="padding: 10px 20px; background: linear-gradient(135deg, #4a90e2 0%, #7b68ee 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 10px rgba(74, 144, 226, 0.3); transition: all 0.3s ease;">
+                    <i class="fas fa-sync-alt"></i> 새로고침
+                </button>
+            </div>
+            
+            <div class="board-sections">
+                <!-- 자유게시판 섹션 -->
+                <div class="board-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-comments"></i> 자유게시판</h3>
+                        <a href="board.html?type=free" class="more-btn">더보기 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="board-preview" id="free-preview">
+                        <div class="loading">게시글을 불러오는 중...</div>
+                    </div>
+                </div>
+
+                <!-- 아이템 거래장터 섹션 -->
+                <div class="board-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-exchange-alt"></i> 아이템 거래장터</h3>
+                        <a href="board.html?type=trade" class="more-btn">더보기 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="board-preview" id="trade-preview">
+                        <div class="loading">게시글을 불러오는 중...</div>
+                    </div>
+                </div>
+
+                <!-- 운영자 직거래장터 섹션 -->
+                <div class="board-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-store"></i> 운영자 직거래장터</h3>
+                        <a href="board.html?type=admin_shop" class="more-btn">더보기 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="board-preview" id="admin-shop-preview">
+                        <div class="loading">게시글을 불러오는 중...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 공지사항 -->
+            <div class="notice-section">
+                <div class="notice-box">
+                    <i class="fas fa-bullhorn"></i>
+                    <div class="notice-content">
+                        <h4>공지사항</h4>
+                        <p>아이온 포럼에 오신 것을 환영합니다! 건전한 커뮤니티 문화를 위해 매너있는 활동 부탁드립니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 AION FORUM. All rights reserved.</p>
+            <p>본 사이트는 게임 아이온 팬 커뮤니티입니다.</p>
+        </div>
+    </footer>
+
+    <!-- 전화 문의 플로팅 버튼 -->
+    <a href="tel:010-2644-3529" class="contact-floating-btn" title="운영자에게 연락하기 (010-2644-3529)">
+        <i class="fas fa-phone-alt"></i>
+    </a>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/home.js"></script>
+</body>
+</html>

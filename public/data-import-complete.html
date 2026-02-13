@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 가져오기 (배포 환경용)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        
+        .info-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .info-box h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .info-box ol {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .warning-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .warning-box p {
+            color: #856404;
+        }
+        
+        .upload-area {
+            border: 3px dashed #4caf50;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f9fbe7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            background: #f1f8e9;
+            border-color: #388e3c;
+        }
+        
+        .upload-area.dragover {
+            background: #dcedc8;
+            border-color: #2e7d32;
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .upload-hint {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status h3 {
+            color: #333;
+            margin-bottom: 15px;
+            position: sticky;
+            top: 0;
+            background: #f5f5f5;
+            padding-bottom: 10px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .status-item.error {
+            border-left-color: #f44336;
+        }
+        
+        .status-item.loading {
+            border-left-color: #2196f3;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(17, 153, 142, 0.3);
+            border-radius: 50%;
+            border-top-color: #11998e;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .file-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .file-info h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .success-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .success-box.show {
+            display: block;
+        }
+        
+        .success-box h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 데이터 가져오기</h1>
+        <p class="subtitle">내보낸 JSON 파일을 업로드하여 모든 데이터를 복구합니다</p>
+        
+        <div class="warning-box">
+            <h3>⚠️ 주의사항</h3>
+            <p><strong>이 작업은 기존 데이터를 모두 덮어씁니다!</strong></p>
+            <p>실행 전에 현재 데이터를 백업하는 것을 권장합니다.</p>
+        </div>
+        
+        <div class="info-box">
+            <h3>📋 사용 방법</h3>
+            <ol>
+                <li><strong>data-export-complete.html</strong>에서 내보낸 JSON 파일을 준비합니다</li>
+                <li>아래 영역을 클릭하거나 파일을 드래그 앤 드롭합니다</li>
+                <li>"데이터 가져오기" 버튼을 클릭합니다</li>
+                <li>완료 후 홈페이지로 돌아가 확인합니다</li>
+            </ol>
+        </div>
+        
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">JSON 파일을 선택하거나 여기에 드롭하세요</div>
+            <div class="upload-hint">aion-forum-data-*.json</div>
+        </div>
+        
+        <input type="file" id="file-input" accept=".json" onchange="handleFileSelect(event)">
+        
+        <div class="file-info" id="file-info">
+            <h4>📄 선택된 파일</h4>
+            <div id="file-details"></div>
+        </div>
+        
+        <button class="btn" id="import-btn" onclick="importAllData()" disabled>
+            📥 데이터 가져오기 시작
+        </button>
+        
+        <div class="status" id="status">
+            <h3>진행 상황</h3>
+            <div id="status-list"></div>
+        </div>
+        
+        <div class="success-box" id="success-box">
+            <h3>✅ 가져오기 완료!</h3>
+            <p>모든 데이터가 성공적으로 복구되었습니다.</p>
+            <p>이제 사이트를 정상적으로 사용할 수 있습니다!</p>
+            <a href="index.html" class="back-link">🏠 홈페이지로 이동</a>
+        </div>
+    </div>
+    
+    <script>
+        let selectedFile = null;
+        let fileData = null;
+        
+        // 드래그 앤 드롭 이벤트
+        const uploadArea = document.getElementById('upload-area');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+        
+        function handleFile(file) {
+            if (!file.name.endsWith('.json')) {
+                alert('JSON 파일만 업로드할 수 있습니다.');
+                return;
+            }
+            
+            selectedFile = file;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    fileData = JSON.parse(e.target.result);
+                    
+                    // 파일 정보 표시
+                    const fileInfo = document.getElementById('file-info');
+                    const fileDetails = document.getElementById('file-details');
+                    
+                    const totalRecords = Object.values(fileData.tables || {}).reduce((sum, arr) => sum + arr.length, 0);
+                    
+                    fileDetails.innerHTML = `
+                        <p><strong>파일명:</strong> ${file.name}</p>
+                        <p><strong>내보낸 날짜:</strong> ${new Date(fileData.exported_at).toLocaleString('ko-KR')}</p>
+                        <p><strong>게시글:</strong> ${fileData.tables.posts?.length || 0}개</p>
+                        <p><strong>댓글:</strong> ${fileData.tables.comments?.length || 0}개</p>
+                        <p><strong>거래신청:</strong> ${fileData.tables.trade_requests?.length || 0}개</p>
+                        <p><strong>회원:</strong> ${fileData.tables.members?.length || 0}개</p>
+                        <p><strong>총 레코드:</strong> ${totalRecords}개</p>
+                    `;
+                    
+                    fileInfo.classList.add('show');
+                    document.getElementById('import-btn').disabled = false;
+                    
+                } catch (error) {
+                    alert('JSON 파일을 읽을 수 없습니다. 파일이 손상되었거나 잘못된 형식입니다.');
+                    console.error('JSON 파싱 오류:', error);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        async function importAllData() {
+            if (!fileData) {
+                alert('먼저 파일을 선택해주세요.');
+                return;
+            }
+            
+            const confirmed = confirm('⚠️ 기존 데이터가 모두 삭제되고 새 데이터로 교체됩니다. 계속하시겠습니까?');
+            if (!confirmed) return;
+            
+            const btn = document.getElementById('import-btn');
+            const status = document.getElementById('status');
+            const statusList = document.getElementById('status-list');
+            const successBox = document.getElementById('success-box');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> 가져오는 중...';
+            status.classList.add('show');
+            statusList.innerHTML = '';
+            successBox.classList.remove('show');
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (const [tableName, records] of Object.entries(fileData.tables)) {
+                if (!records || records.length === 0) {
+                    addStatus(statusList, `${tableName}: 데이터 없음 (건너뜀)`, 'loading');
+                    continue;
+                }
+                
+                addStatus(statusList, `${tableName}: ${records.length}개 레코드 가져오는 중...`, 'loading');
+                
+                try {
+                    // 각 레코드를 개별적으로 POST
+                    let imported = 0;
+                    let failed = 0;
+                    
+                    for (const record of records) {
+                        try {
+                            // 시스템 필드 제거 (서버에서 자동 생성)
+                            const cleanRecord = { ...record };
+                            delete cleanRecord.gs_project_id;
+                            delete cleanRecord.gs_table_name;
+                            
+                            const response = await fetch(`tables/${tableName}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(cleanRecord)
+                            });
+                            
+                            if (response.ok) {
+                                imported++;
+                            } else {
+                                failed++;
+                                console.error(`${tableName} 레코드 가져오기 실패:`, await response.text());
+                            }
+                            
+                        } catch (error) {
+                            failed++;
+                            console.error(`${tableName} 레코드 가져오기 오류:`, error);
+                        }
+                    }
+                    
+                    if (failed === 0) {
+                        updateStatus(statusList, tableName, `✅ ${tableName}: ${imported}개 성공`, 'success');
+                        successCount++;
+                    } else {
+                        updateStatus(statusList, tableName, `⚠️ ${tableName}: ${imported}개 성공, ${failed}개 실패`, 'error');
+                        errorCount++;
+                    }
+                    
+                } catch (error) {
+                    console.error(`${tableName} 가져오기 오류:`, error);
+                    updateStatus(statusList, tableName, `❌ ${tableName}: 오류 발생`, 'error');
+                    errorCount++;
+                }
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '📥 데이터 가져오기 시작';
+            
+            if (errorCount === 0) {
+                successBox.classList.add('show');
+                successBox.innerHTML = `
+                    <h3>✅ 가져오기 완료!</h3>
+                    <p>모든 데이터가 성공적으로 복구되었습니다.</p>
+                    <p><strong>총 ${successCount}개 테이블</strong>의 데이터를 가져왔습니다.</p>
+                    <p>이제 사이트를 정상적으로 사용할 수 있습니다!</p>
+                    <a href="index.html" class="back-link">🏠 홈페이지로 이동</a>
+                `;
+            } else {
+                alert(`가져오기 완료!\n성공: ${successCount}개 테이블\n실패: ${errorCount}개 테이블\n\n자세한 내용은 진행 상황을 확인하세요.`);
+            }
+        }
+        
+        function addStatus(container, message, type = 'loading') {
+            const div = document.createElement('div');
+            div.className = `status-item ${type}`;
+            div.id = `status-${message.split(':')[0].trim()}`;
+            div.innerHTML = `
+                <span>${message}</span>
+                ${type === 'loading' ? '<span class="spinner"></span>' : ''}
+            `;
+            container.appendChild(div);
+        }
+        
+        function updateStatus(container, key, message, type = 'success') {
+            const statusItem = document.getElementById(`status-${key}`);
+            if (statusItem) {
+                statusItem.className = `status-item ${type}`;
+                statusItem.innerHTML = `<span>${message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

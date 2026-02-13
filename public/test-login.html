@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #357abd;
+        }
+        .log {
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 로그인 기능 테스트</h1>
+
+    <div class="test-section">
+        <h2>1. 스크립트 로드 확인</h2>
+        <button onclick="checkScripts()">스크립트 확인</button>
+        <div id="script-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 함수 존재 확인</h2>
+        <button onclick="checkFunctions()">함수 확인</button>
+        <div id="function-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. localStorage 테스트</h2>
+        <button onclick="testLocalStorage()">localStorage 테스트</button>
+        <div id="storage-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 로그인 테스트</h2>
+        <input type="text" id="test-id" placeholder="아이디 (admin)" value="admin">
+        <input type="password" id="test-pw" placeholder="비밀번호 (admin1234)" value="admin1234">
+        <button onclick="testLogin()">로그인 테스트</button>
+        <div id="login-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. showAlert 테스트</h2>
+        <button onclick="testShowAlert('success')">성공 알림</button>
+        <button onclick="testShowAlert('error')">에러 알림</button>
+        <button onclick="testShowAlert('info')">정보 알림</button>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        function log(elementId, message, type = 'info') {
+            const logDiv = document.getElementById(elementId);
+            const className = type;
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function checkScripts() {
+            const logId = 'script-log';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, '=== 스크립트 파일 로드 확인 ===', 'info');
+            
+            // main.js에서 로드된 변수 확인
+            if (typeof API_BASE !== 'undefined') {
+                log(logId, `✅ API_BASE 정의됨: ${API_BASE}`, 'success');
+            } else {
+                log(logId, '❌ API_BASE 정의되지 않음', 'error');
+            }
+
+            // 전역 스크립트 확인
+            const scripts = document.querySelectorAll('script[src]');
+            log(logId, `총 ${scripts.length}개의 외부 스크립트 로드됨`, 'info');
+            scripts.forEach((script, index) => {
+                log(logId, `  ${index + 1}. ${script.src}`, 'info');
+            });
+        }
+
+        function checkFunctions() {
+            const logId = 'function-log';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, '=== 필수 함수 존재 확인 ===', 'info');
+            
+            const functions = [
+                'showAlert',
+                'isAdmin',
+                'setAdminSession',
+                'formatDate',
+                'getRelativeTime'
+            ];
+            
+            functions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    log(logId, `✅ ${funcName}() 함수 존재`, 'success');
+                } else {
+                    log(logId, `❌ ${funcName}() 함수 없음`, 'error');
+                }
+            });
+        }
+
+        function testLocalStorage() {
+            const logId = 'storage-log';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, '=== localStorage 테스트 ===', 'info');
+            
+            try {
+                // 쓰기 테스트
+                localStorage.setItem('test_key', 'test_value');
+                log(logId, '✅ localStorage 쓰기 성공', 'success');
+                
+                // 읽기 테스트
+                const value = localStorage.getItem('test_key');
+                if (value === 'test_value') {
+                    log(logId, '✅ localStorage 읽기 성공', 'success');
+                } else {
+                    log(logId, '❌ localStorage 읽기 실패', 'error');
+                }
+                
+                // 삭제 테스트
+                localStorage.removeItem('test_key');
+                log(logId, '✅ localStorage 삭제 성공', 'success');
+                
+                // 관리자 계정 정보 확인
+                const adminUser = localStorage.getItem('admin_username') || 'admin';
+                const adminPass = localStorage.getItem('admin_password') || 'admin1234';
+                log(logId, `관리자 계정: ${adminUser} / ${adminPass}`, 'info');
+                
+                // 현재 로그인 상태 확인
+                const isLoggedIn = localStorage.getItem('admin_logged_in');
+                log(logId, `현재 로그인 상태: ${isLoggedIn || '없음'}`, 'info');
+                
+            } catch (error) {
+                log(logId, `❌ localStorage 에러: ${error.message}`, 'error');
+            }
+        }
+
+        function testLogin() {
+            const logId = 'login-log';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, '=== 로그인 테스트 시작 ===', 'info');
+            
+            const adminId = document.getElementById('test-id').value.trim();
+            const adminPassword = document.getElementById('test-pw').value.trim();
+            
+            log(logId, `입력된 ID: ${adminId}`, 'info');
+            log(logId, `입력된 PW: ${'*'.repeat(adminPassword.length)}`, 'info');
+            
+            const storedUsername = localStorage.getItem('admin_username') || 'admin';
+            const storedPassword = localStorage.getItem('admin_password') || 'admin1234';
+            
+            log(logId, `저장된 계정: ${storedUsername} / ${storedPassword}`, 'info');
+            
+            if (adminId === storedUsername && adminPassword === storedPassword) {
+                log(logId, '✅ 인증 성공!', 'success');
+                
+                // 세션 설정
+                if (typeof setAdminSession === 'function') {
+                    setAdminSession(true);
+                    log(logId, '✅ 세션 설정 완료', 'success');
+                } else {
+                    localStorage.setItem('admin_logged_in', 'true');
+                    log(logId, '⚠️ setAdminSession 함수 없음 (수동 설정)', 'error');
+                }
+                
+                // 알림 테스트
+                if (typeof showAlert === 'function') {
+                    showAlert('로그인 성공!', 'success');
+                    log(logId, '✅ showAlert 호출 완료', 'success');
+                } else {
+                    log(logId, '❌ showAlert 함수 없음', 'error');
+                }
+                
+                log(logId, '1초 후 admin.html로 이동 예정...', 'info');
+                
+                setTimeout(() => {
+                    log(logId, '🔄 페이지 이동 중...', 'info');
+                    // window.location.href = 'admin.html';
+                }, 1000);
+                
+            } else {
+                log(logId, '❌ 인증 실패!', 'error');
+                log(logId, `ID 일치: ${adminId === storedUsername}`, 'info');
+                log(logId, `PW 일치: ${adminPassword === storedPassword}`, 'info');
+            }
+        }
+
+        function testShowAlert(type) {
+            if (typeof showAlert === 'function') {
+                const messages = {
+                    'success': '성공 메시지입니다!',
+                    'error': '에러 메시지입니다!',
+                    'info': '정보 메시지입니다!'
+                };
+                showAlert(messages[type], type);
+            } else {
+                alert('showAlert 함수가 정의되지 않았습니다!');
+            }
+        }
+
+        // 페이지 로드 시 자동 실행
+        window.addEventListener('load', () => {
+            console.log('테스트 페이지 로드 완료');
+            console.log('API_BASE:', typeof API_BASE !== 'undefined' ? API_BASE : '정의안됨');
+            console.log('showAlert:', typeof showAlert);
+            console.log('isAdmin:', typeof isAdmin);
+            console.log('setAdminSession:', typeof setAdminSession);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 전체 내보내기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .info-box ol {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            font-weight: 600;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .status-item.error {
+            border-left-color: #f44336;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .success-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .success-box.show {
+            display: block;
+        }
+        
+        .success-box h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .download-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .download-link:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 데이터 전체 내보내기</h1>
+        <p class="subtitle">현재 개발 환경의 모든 데이터를 JSON 파일로 다운로드합니다</p>
+        
+        <div class="info-box">
+            <h3>📋 사용 방법</h3>
+            <ol>
+                <li><strong>아래 버튼을 클릭</strong>하여 데이터를 내보냅니다</li>
+                <li><strong>aion-forum-data.json</strong> 파일이 자동으로 다운로드됩니다</li>
+                <li>Netlify에 사이트를 배포합니다</li>
+                <li>배포된 사이트에서 <strong>data-import-complete.html</strong>을 엽니다</li>
+                <li>다운로드한 JSON 파일을 업로드하면 모든 데이터가 복구됩니다</li>
+            </ol>
+        </div>
+        
+        <button class="btn" id="export-btn" onclick="exportAllData()">
+            🚀 데이터 내보내기 시작
+        </button>
+        
+        <div class="status" id="status">
+            <h3>진행 상황</h3>
+            <div id="status-list"></div>
+        </div>
+        
+        <div class="success-box" id="success-box">
+            <h3>✅ 내보내기 완료!</h3>
+            <p>파일이 자동으로 다운로드되었습니다.</p>
+            <p><strong>파일명:</strong> aion-forum-data.json</p>
+            <p>이 파일을 안전한 곳에 보관하고, 배포 후 data-import-complete.html에서 가져오기 하세요!</p>
+        </div>
+    </div>
+    
+    <script>
+        async function exportAllData() {
+            const btn = document.getElementById('export-btn');
+            const status = document.getElementById('status');
+            const statusList = document.getElementById('status-list');
+            const successBox = document.getElementById('success-box');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> 내보내는 중...';
+            status.classList.add('show');
+            statusList.innerHTML = '';
+            successBox.classList.remove('show');
+            
+            const allData = {
+                exported_at: new Date().toISOString(),
+                version: '1.0',
+                tables: {}
+            };
+            
+            const tables = ['posts', 'comments', 'trade_requests', 'members'];
+            
+            for (const tableName of tables) {
+                try {
+                    addStatus(statusList, `${tableName} 테이블 가져오는 중...`, 'loading');
+                    
+                    let allRecords = [];
+                    let page = 1;
+                    const limit = 100;
+                    let hasMore = true;
+                    
+                    while (hasMore) {
+                        const response = await fetch(`tables/${tableName}?page=${page}&limit=${limit}`);
+                        const data = await response.json();
+                        
+                        if (data.data && data.data.length > 0) {
+                            allRecords = allRecords.concat(data.data);
+                            page++;
+                            
+                            if (data.data.length < limit) {
+                                hasMore = false;
+                            }
+                        } else {
+                            hasMore = false;
+                        }
+                    }
+                    
+                    allData.tables[tableName] = allRecords;
+                    updateStatus(statusList, tableName, `✅ ${tableName}: ${allRecords.length}개 레코드`);
+                    
+                } catch (error) {
+                    console.error(`${tableName} 내보내기 오류:`, error);
+                    updateStatus(statusList, tableName, `❌ ${tableName}: 오류 발생`, 'error');
+                }
+            }
+            
+            // JSON 파일로 다운로드
+            const jsonStr = JSON.stringify(allData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `aion-forum-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            btn.disabled = false;
+            btn.innerHTML = '🚀 데이터 내보내기 시작';
+            successBox.classList.add('show');
+            
+            // 요약 정보 표시
+            const summary = `
+                <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+                    <strong>📊 내보내기 요약</strong><br>
+                    게시글: ${allData.tables.posts?.length || 0}개<br>
+                    댓글: ${allData.tables.comments?.length || 0}개<br>
+                    거래신청: ${allData.tables.trade_requests?.length || 0}개<br>
+                    회원: ${allData.tables.members?.length || 0}개<br>
+                    <strong>총 ${Object.values(allData.tables).reduce((sum, arr) => sum + arr.length, 0)}개 레코드</strong>
+                </div>
+            `;
+            successBox.innerHTML += summary;
+        }
+        
+        function addStatus(container, message, type = 'loading') {
+            const div = document.createElement('div');
+            div.className = `status-item ${type}`;
+            div.id = `status-${message.split(' ')[0]}`;
+            div.innerHTML = `
+                <span>${message}</span>
+                ${type === 'loading' ? '<span class="spinner"></span>' : ''}
+            `;
+            container.appendChild(div);
+        }
+        
+        function updateStatus(container, key, message, type = 'success') {
+            const statusItem = document.getElementById(`status-${key}`);
+            if (statusItem) {
+                statusItem.className = `status-item ${type}`;
+                statusItem.innerHTML = `<span>${message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

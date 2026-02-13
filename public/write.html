@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>글쓰기 - 아이온 포럼</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-dragon"></i>
+                    <h1>AION FORUM</h1>
+                </div>
+                <nav class="main-nav">
+                    <ul id="main-nav-menu">
+                        <li><a href="index.html"><i class="fas fa-home"></i> 홈</a></li>
+                        <li><a href="board.html?type=free"><i class="fas fa-comments"></i> 자유게시판</a></li>
+                        <li><a href="board.html?type=trade"><i class="fas fa-exchange-alt"></i> 아이템 거래장터</a></li>
+                        <li><a href="board.html?type=admin_shop"><i class="fas fa-store"></i> 운영자 직거래장터</a></li>
+                        <li id="nav-auth">
+                            <a href="login.html"><i class="fas fa-sign-in-alt"></i> 로그인</a>
+                        </li>
+                        <li id="nav-register">
+                            <a href="register.html"><i class="fas fa-user-plus"></i> 회원가입</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 글쓰기 폼 -->
+    <main class="main-content">
+        <div class="container">
+            <div class="write-container">
+                <h2 id="write-title"><i class="fas fa-pen"></i> 글쓰기</h2>
+                
+                <form id="write-form">
+                    <div class="form-group">
+                        <label for="title">제목 <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" required placeholder="제목을 입력하세요">
+                    </div>
+
+                    <!-- 거래 게시판 전용 필드 -->
+                    <div id="trade-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="item_name">아이템명 <span class="required">*</span></label>
+                            <input type="text" id="item_name" name="item_name" placeholder="거래할 아이템명을 입력하세요">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">가격 <span class="required">*</span></label>
+                            <input type="text" id="price" name="price" placeholder="가격을 입력하세요 (예: 100,000 키나)">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">내용 <span class="required">*</span></label>
+                        <textarea id="content" name="content" required placeholder="내용을 입력하세요" rows="15"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary"><i class="fas fa-check"></i> 등록</button>
+                        <button type="button" class="btn-secondary" onclick="history.back()"><i class="fas fa-times"></i> 취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 AION FORUM. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 전화 문의 플로팅 버튼 -->
+    <a href="tel:010-2644-3529" class="contact-floating-btn" title="운영자에게 연락하기 (010-2644-3529)">
+        <i class="fas fa-phone-alt"></i>
+    </a>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/write.js"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 보기 - 아이온 포럼</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-dragon"></i>
+                    <h1>AION FORUM</h1>
+                </div>
+                <nav class="main-nav">
+                    <ul id="main-nav-menu">
+                        <li><a href="index.html"><i class="fas fa-home"></i> 홈</a></li>
+                        <li><a href="board.html?type=free"><i class="fas fa-comments"></i> 자유게시판</a></li>
+                        <li><a href="board.html?type=trade"><i class="fas fa-exchange-alt"></i> 아이템 거래장터</a></li>
+                        <li><a href="board.html?type=admin_shop"><i class="fas fa-store"></i> 운영자 직거래장터</a></li>
+                        <li id="nav-auth">
+                            <a href="login.html"><i class="fas fa-sign-in-alt"></i> 로그인</a>
+                        </li>
+                        <li id="nav-register">
+                            <a href="register.html"><i class="fas fa-user-plus"></i> 회원가입</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 게시글 상세 -->
+    <main class="main-content">
+        <div class="container">
+            <div class="post-detail">
+                <!-- 게시글 헤더 -->
+                <div class="post-header">
+                    <h2 id="post-title" class="post-title-detail">제목</h2>
+                    <div class="post-meta">
+                        <span class="post-author"><i class="fas fa-user"></i> <span id="post-author">작성자</span></span>
+                        <span class="post-date"><i class="fas fa-clock"></i> <span id="post-date">날짜</span></span>
+                        <span class="post-views"><i class="fas fa-eye"></i> <span id="post-views">0</span></span>
+                    </div>
+                </div>
+
+                <!-- 거래 정보 (거래 게시판인 경우) -->
+                <div id="trade-info" style="display: none;" class="trade-info">
+                    <div class="trade-item">
+                        <strong>아이템명:</strong> <span id="item-name"></span>
+                    </div>
+                    <div class="trade-item">
+                        <strong>가격:</strong> <span id="item-price"></span>
+                    </div>
+                </div>
+
+                <!-- 게시글 내용 -->
+                <div class="post-content" id="post-content">
+                    <p>내용을 불러오는 중...</p>
+                </div>
+
+                <!-- 운영자 직거래장터 거래신청 버튼 -->
+                <div id="trade-request-btn-container" style="display: none; text-align: center; margin: 2rem 0;">
+                    <button class="btn-trade-sell" onclick="openTradeModal('sell')" style="margin: 0 10px; padding: 15px 40px; font-size: 1.1rem; border-radius: 8px; background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,107,0.4);">
+                        <i class="fas fa-hand-holding-usd"></i> 판매신청
+                    </button>
+                    <button class="btn-trade-buy" onclick="openTradeModal('buy')" style="margin: 0 10px; padding: 15px 40px; font-size: 1.1rem; border-radius: 8px; background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(79,172,254,0.4);">
+                        <i class="fas fa-shopping-cart"></i> 구매신청
+                    </button>
+                </div>
+
+                <!-- 게시글 액션 버튼 -->
+                <div class="post-actions">
+                    <button class="btn-secondary" onclick="goBack()"><i class="fas fa-list"></i> 목록</button>
+                    <div class="post-action-right">
+                        <button class="btn-edit" id="edit-btn" style="display: none;"><i class="fas fa-edit"></i> 수정</button>
+                        <button class="btn-delete" id="delete-btn" style="display: none;"><i class="fas fa-trash"></i> 삭제</button>
+                    </div>
+                </div>
+
+                <!-- 댓글 섹션 -->
+                <div class="comment-section">
+                    <h3 class="comment-title"><i class="fas fa-comment"></i> 댓글 <span id="comment-count">0</span></h3>
+                    
+                    <!-- 댓글 작성 폼 -->
+                    <div class="comment-write">
+                        <form id="comment-form">
+                            <textarea id="comment-content" placeholder="댓글을 입력하세요..." required></textarea>
+                            <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> 등록</button>
+                        </form>
+                    </div>
+
+                    <!-- 댓글 목록 -->
+                    <div class="comment-list" id="comment-list">
+                        <p class="no-comments">댓글이 없습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 AION FORUM. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 거래신청 모달 -->
+    <div id="trade-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 id="trade-modal-title"><i class="fas fa-shopping-cart"></i> 거래신청</h3>
+                <button class="modal-close" onclick="closeTradeModal()">&times;</button>
+            </div>
+            <form id="trade-form">
+                <div class="modal-body">
+                    <input type="hidden" id="trade-type" name="trade_type">
+                    
+                    <div class="form-group">
+                        <label for="trade-name">신청자 이름 <span class="required">*</span></label>
+                        <input type="text" id="trade-name" name="name" required placeholder="이름을 입력하세요">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="trade-id-front">주민등록번호 <span class="required">*</span></label>
+                        <div class="id-number-input">
+                            <input type="text" id="trade-id-front" name="id_front" maxlength="6" required placeholder="앞 6자리" pattern="[0-9]{6}">
+                            <span>-</span>
+                            <input type="text" id="trade-id-back" name="id_back" maxlength="1" required placeholder="뒤 1자리" pattern="[0-9]{1}" style="width: 60px;">
+                        </div>
+                        <small class="form-help">예: 900101-1</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="trade-game-id">게임 아이디 <span class="required">*</span></label>
+                        <input type="text" id="trade-game-id" name="game_id" required placeholder="게임 아이디를 입력하세요">
+                    </div>
+
+                    <div class="form-group" id="sell-amount-group" style="display: none;">
+                        <label for="trade-sell-amount">판매금액 (원) <span class="required">*</span></label>
+                        <input type="number" id="trade-sell-amount" name="sell_amount" placeholder="판매금액을 입력하세요" min="0">
+                        <small class="form-help">원화로 입력하세요 (예: 1000000)</small>
+                    </div>
+
+                    <div class="form-group" id="buy-amount-group" style="display: none;">
+                        <label for="trade-buy-amount">구매금액 (원) <span class="required">*</span></label>
+                        <input type="number" id="trade-buy-amount" name="buy_amount" placeholder="구매금액을 입력하세요" min="0">
+                        <small class="form-help">원화로 입력하세요 (예: 1000000)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeTradeModal()">취소</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-check"></i> 신청하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 전화 문의 플로팅 버튼 -->
+    <a href="tel:010-2644-3529" class="contact-floating-btn" title="운영자에게 연락하기 (010-2644-3529)">
+        <i class="fas fa-phone-alt"></i>
+    </a>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/post.js"></script>
+</body>
+</html>

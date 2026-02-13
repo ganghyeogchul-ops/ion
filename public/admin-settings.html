@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 설정 - 아이온 포럼</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: var(--dark-secondary);
+            border-radius: 15px;
+        }
+        
+        .settings-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .settings-header h2 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--dark-tertiary);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary-color);
+        }
+        
+        .setting-section {
+            background: var(--dark-bg);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .setting-section h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--dark-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+        
+        .btn-save {
+            padding: 12px 25px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-save:hover:not(:disabled) {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn-save:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-save.success {
+            background: #4caf50 !important;
+            animation: successPulse 0.5s ease;
+        }
+        
+        @keyframes successPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .info-box {
+            background: rgba(74, 144, 226, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box p {
+            color: var(--text-secondary);
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .current-info {
+            background: var(--dark-tertiary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .current-info p {
+            color: var(--text-primary);
+            margin: 8px 0;
+        }
+        
+        .current-info strong {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" onclick="location.href='index.html'">
+                    <img src="/static/images/aion-logo.jpg" alt="AION" class="logo-image">
+                    <h1>AION FORUM</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="settings-container">
+            <div class="settings-header">
+                <h2><i class="fas fa-cog"></i> 관리자 설정</h2>
+                <a href="admin.html" class="back-btn"><i class="fas fa-arrow-left"></i> 대시보드로</a>
+            </div>
+            
+            <!-- 현재 계정 정보 -->
+            <div class="setting-section">
+                <h3><i class="fas fa-user-shield"></i> 현재 계정 정보</h3>
+                <div class="current-info">
+                    <p><strong>아이디:</strong> <span id="current-username">-</span></p>
+                    <p><strong>마지막 수정:</strong> <span id="last-modified">-</span></p>
+                </div>
+            </div>
+            
+            <!-- 아이디 변경 -->
+            <div class="setting-section">
+                <h3><i class="fas fa-user-edit"></i> 아이디 변경</h3>
+                <div class="info-box">
+                    <p><i class="fas fa-info-circle"></i> 아이디는 영문, 숫자 조합 4~20자로 설정 가능합니다.</p>
+                    <p><i class="fas fa-exclamation-triangle"></i> 아이디 변경 후에는 새 아이디로 로그인해야 합니다.</p>
+                </div>
+                <form id="username-form">
+                    <div class="form-group">
+                        <label for="current-password-1">현재 비밀번호</label>
+                        <input type="password" id="current-password-1" required placeholder="현재 비밀번호를 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-username">새 아이디</label>
+                        <input type="text" id="new-username" required placeholder="새 아이디 (영문, 숫자 4~20자)" pattern="[a-zA-Z0-9]{4,20}">
+                    </div>
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> 아이디 변경</button>
+                </form>
+            </div>
+            
+            <!-- 비밀번호 변경 -->
+            <div class="setting-section">
+                <h3><i class="fas fa-key"></i> 비밀번호 변경</h3>
+                <div class="info-box">
+                    <p><i class="fas fa-info-circle"></i> 비밀번호는 최소 6자 이상으로 설정해주세요.</p>
+                    <p><i class="fas fa-exclamation-triangle"></i> 비밀번호 변경 후에는 새 비밀번호로 로그인해야 합니다.</p>
+                </div>
+                <form id="password-form">
+                    <div class="form-group">
+                        <label for="current-password-2">현재 비밀번호</label>
+                        <input type="password" id="current-password-2" required placeholder="현재 비밀번호를 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">새 비밀번호</label>
+                        <input type="password" id="new-password" required placeholder="새 비밀번호 (최소 6자)" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">새 비밀번호 확인</label>
+                        <input type="password" id="confirm-password" required placeholder="새 비밀번호 확인">
+                    </div>
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> 비밀번호 변경</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // 관리자 체크
+        if (!isAdmin()) {
+            alert('관리자만 접근 가능합니다.');
+            window.location.href = 'admin-login.html';
+        }
+        
+        // 현재 관리자 정보 로드
+        function loadCurrentInfo() {
+            const adminUsername = localStorage.getItem('admin_username') || 'admin';
+            const lastModified = localStorage.getItem('admin_last_modified');
+            
+            document.getElementById('current-username').textContent = adminUsername;
+            
+            if (lastModified) {
+                const date = new Date(parseInt(lastModified));
+                document.getElementById('last-modified').textContent = formatDate(date.getTime());
+            } else {
+                document.getElementById('last-modified').textContent = '정보 없음';
+            }
+        }
+        
+        // 아이디 변경
+        document.getElementById('username-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            const currentPassword = document.getElementById('current-password-1').value;
+            const newUsername = document.getElementById('new-username').value.trim();
+            
+            // 아이디 형식 검증
+            const usernamePattern = /^[a-zA-Z0-9]{4,20}$/;
+            if (!usernamePattern.test(newUsername)) {
+                showNotification('아이디는 영문, 숫자 조합 4~20자여야 합니다.', 'error');
+                return;
+            }
+            
+            // 현재 비밀번호 확인
+            const adminPassword = localStorage.getItem('admin_password') || 'admin1234';
+            if (currentPassword !== adminPassword) {
+                showNotification('현재 비밀번호가 올바르지 않습니다.', 'error');
+                return;
+            }
+            
+            // 기존 아이디와 같은지 확인
+            const currentUsername = localStorage.getItem('admin_username') || 'admin';
+            if (newUsername === currentUsername) {
+                showNotification('현재 아이디와 동일합니다.', 'error');
+                return;
+            }
+            
+            if (!confirm(`아이디를 "${newUsername}"(으)로 변경하시겠습니까?\n\n변경 후에는 새 아이디로 로그인해야 합니다.`)) {
+                return;
+            }
+            
+            // 버튼 로딩 상태
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 변경 중...';
+            
+            // 약간의 딜레이 (사용자 피드백)
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // 아이디 변경
+            localStorage.setItem('admin_username', newUsername);
+            localStorage.setItem('admin_last_modified', Date.now().toString());
+            
+            // 성공 표시
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> 변경 완료!';
+            submitBtn.classList.add('success');
+            
+            showNotification(`아이디가 "${newUsername}"(으)로 변경되었습니다! 2초 후 로그인 페이지로 이동합니다.`, 'success');
+            
+            setTimeout(() => {
+                localStorage.removeItem('admin_logged_in');
+                window.location.href = 'admin-login.html';
+            }, 2000);
+        });
+        
+        // 비밀번호 변경
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            const currentPassword = document.getElementById('current-password-2').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            // 비밀번호 길이 확인
+            if (newPassword.length < 6) {
+                showNotification('비밀번호는 최소 6자 이상이어야 합니다.', 'error');
+                return;
+            }
+            
+            // 새 비밀번호 확인
+            if (newPassword !== confirmPassword) {
+                showNotification('새 비밀번호가 일치하지 않습니다.', 'error');
+                return;
+            }
+            
+            // 현재 비밀번호 확인
+            const adminPassword = localStorage.getItem('admin_password') || 'admin1234';
+            if (currentPassword !== adminPassword) {
+                showNotification('현재 비밀번호가 올바르지 않습니다.', 'error');
+                return;
+            }
+            
+            // 기존 비밀번호와 같은지 확인
+            if (newPassword === adminPassword) {
+                showNotification('현재 비밀번호와 동일합니다.', 'error');
+                return;
+            }
+            
+            if (!confirm('비밀번호를 변경하시겠습니까?\n\n변경 후에는 새 비밀번호로 로그인해야 합니다.')) {
+                return;
+            }
+            
+            // 버튼 로딩 상태
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 변경 중...';
+            
+            // 약간의 딜레이 (사용자 피드백)
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // 비밀번호 변경
+            localStorage.setItem('admin_password', newPassword);
+            localStorage.setItem('admin_last_modified', Date.now().toString());
+            
+            // 성공 표시
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> 변경 완료!';
+            submitBtn.classList.add('success');
+            
+            showNotification('비밀번호가 성공적으로 변경되었습니다! 2초 후 로그인 페이지로 이동합니다.', 'success');
+            
+            setTimeout(() => {
+                localStorage.removeItem('admin_logged_in');
+                window.location.href = 'admin-login.html';
+            }, 2000);
+        });
+        
+        // 페이지 로드 시 현재 정보 표시
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCurrentInfo();
+        });
+    </script>
+</body>
+</html>

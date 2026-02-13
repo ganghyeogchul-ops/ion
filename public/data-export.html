@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 내보내기 - 아이온 포럼</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .export-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: var(--dark-secondary);
+            border-radius: 10px;
+        }
+        .export-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--dark-bg);
+            border-radius: 8px;
+        }
+        .export-btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: var(--success-color); color: white; }
+        .error { background: var(--danger-color); color: white; }
+        .info { background: var(--primary-color); color: white; }
+        pre {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 400px;
+            color: #00ff00;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="export-container">
+        <h1><i class="fas fa-download"></i> 데이터 내보내기</h1>
+        <p>현재 개발 환경의 모든 데이터를 JSON 파일로 내보냅니다.</p>
+
+        <div class="export-section">
+            <h3><i class="fas fa-database"></i> 내보낼 데이터</h3>
+            <ul>
+                <li>✅ 게시글 (posts)</li>
+                <li>✅ 댓글 (comments)</li>
+                <li>✅ 거래신청 (trade_requests)</li>
+                <li>✅ 회원 (members)</li>
+            </ul>
+            
+            <button class="btn-primary export-btn" onclick="exportAllData()">
+                <i class="fas fa-file-export"></i> 모든 데이터 내보내기
+            </button>
+        </div>
+
+        <div id="status"></div>
+
+        <div class="export-section">
+            <h3><i class="fas fa-info-circle"></i> 사용 방법</h3>
+            <ol>
+                <li><strong>데이터 내보내기</strong>: 위 버튼 클릭 → JSON 파일 다운로드</li>
+                <li><strong>파일 저장</strong>: <code>aion-forum-data.json</code> 파일 저장</li>
+                <li><strong>넷플리파이 배포</strong>: 모든 파일 배포</li>
+                <li><strong>데이터 가져오기</strong>: 배포된 사이트에서 <code>/data-import.html</code> 접속</li>
+                <li><strong>파일 업로드</strong>: 저장한 JSON 파일 업로드</li>
+            </ol>
+        </div>
+
+        <div id="preview" style="display: none;">
+            <h3><i class="fas fa-code"></i> 데이터 미리보기</h3>
+            <pre id="preview-content"></pre>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        async function exportAllData() {
+            const statusDiv = document.getElementById('status');
+            const previewDiv = document.getElementById('preview');
+            const previewContent = document.getElementById('preview-content');
+            
+            statusDiv.innerHTML = '<div class="status info"><i class="fas fa-spinner fa-spin"></i> 데이터를 수집하는 중...</div>';
+            
+            try {
+                const allData = {
+                    exportDate: new Date().toISOString(),
+                    version: '1.0',
+                    posts: [],
+                    comments: [],
+                    trade_requests: [],
+                    members: []
+                };
+
+                // 게시글 가져오기
+                statusDiv.innerHTML = '<div class="status info"><i class="fas fa-spinner fa-spin"></i> 게시글 수집 중...</div>';
+                const postsResponse = await fetch('tables/posts?limit=1000');
+                const postsData = await postsResponse.json();
+                allData.posts = postsData.data || [];
+
+                // 댓글 가져오기
+                statusDiv.innerHTML = '<div class="status info"><i class="fas fa-spinner fa-spin"></i> 댓글 수집 중...</div>';
+                const commentsResponse = await fetch('tables/comments?limit=1000');
+                const commentsData = await commentsResponse.json();
+                allData.comments = commentsData.data || [];
+
+                // 거래신청 가져오기
+                statusDiv.innerHTML = '<div class="status info"><i class="fas fa-spinner fa-spin"></i> 거래신청 수집 중...</div>';
+                const tradeResponse = await fetch('tables/trade_requests?limit=1000');
+                const tradeData = await tradeResponse.json();
+                allData.trade_requests = tradeData.data || [];
+
+                // 회원 가져오기
+                statusDiv.innerHTML = '<div class="status info"><i class="fas fa-spinner fa-spin"></i> 회원 정보 수집 중...</div>';
+                const membersResponse = await fetch('tables/members?limit=1000');
+                const membersData = await membersResponse.json();
+                allData.members = membersData.data || [];
+
+                // 통계 표시
+                const stats = `
+                    <div class="status success">
+                        <i class="fas fa-check-circle"></i> 데이터 수집 완료!
+                        <ul style="margin-top: 10px; text-align: left;">
+                            <li>게시글: ${allData.posts.length}개</li>
+                            <li>댓글: ${allData.comments.length}개</li>
+                            <li>거래신청: ${allData.trade_requests.length}개</li>
+                            <li>회원: ${allData.members.length}개</li>
+                        </ul>
+                    </div>
+                `;
+                statusDiv.innerHTML = stats;
+
+                // JSON 파일 생성 및 다운로드
+                const jsonString = JSON.stringify(allData, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'aion-forum-data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // 미리보기 표시
+                previewDiv.style.display = 'block';
+                const previewText = jsonString.substring(0, 1000) + '\n\n... (총 ' + jsonString.length + ' 바이트)';
+                previewContent.textContent = previewText;
+
+                statusDiv.innerHTML += '<div class="status success" style="margin-top: 10px;"><i class="fas fa-download"></i> 파일 다운로드 완료! (aion-forum-data.json)</div>';
+
+            } catch (error) {
+                console.error('데이터 내보내기 오류:', error);
+                statusDiv.innerHTML = '<div class="status error"><i class="fas fa-exclamation-circle"></i> 오류 발생: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>

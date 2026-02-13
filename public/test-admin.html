@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트 - Admin.js 로드 확인</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 40px;
+        }
+        .test-result {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+        .success { border-left: 4px solid #10b981; }
+        .error { border-left: 4px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Admin.js 함수 테스트</h1>
+    
+    <div id="test-results"></div>
+    
+    <button onclick="runTests()" style="padding: 15px 30px; font-size: 18px; margin-top: 20px; cursor: pointer;">
+        테스트 실행
+    </button>
+    
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/admin-api.js"></script>
+    <script src="/static/js/admin.js"></script>
+    
+    <script>
+        async function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<h2>테스트 실행 중...</h2>';
+            
+            let html = '';
+            
+            // Test 1: getTradeRequests 함수 존재 확인
+            if (typeof getTradeRequests === 'function') {
+                html += '<div class="test-result success">✅ getTradeRequests 함수가 정의되어 있습니다.</div>';
+            } else {
+                html += '<div class="test-result error">❌ getTradeRequests 함수가 정의되지 않았습니다.</div>';
+            }
+            
+            // Test 2: switchTab 함수 존재 확인
+            if (typeof switchTab === 'function') {
+                html += '<div class="test-result success">✅ switchTab 함수가 정의되어 있습니다.</div>';
+            } else {
+                html += '<div class="test-result error">❌ switchTab 함수가 정의되지 않았습니다.</div>';
+            }
+            
+            // Test 3: loadRequestsTab 함수 존재 확인
+            if (typeof loadRequestsTab === 'function') {
+                html += '<div class="test-result success">✅ loadRequestsTab 함수가 정의되어 있습니다.</div>';
+            } else {
+                html += '<div class="test-result error">❌ loadRequestsTab 함수가 정의되지 않았습니다.</div>';
+            }
+            
+            // Test 4: API 호출 테스트
+            try {
+                html += '<div class="test-result">⏳ getTradeRequests() 호출 중...</div>';
+                const result = await getTradeRequests(1, 10);
+                html += `<div class="test-result success">✅ API 호출 성공! 데이터: ${result.data.length}개</div>`;
+                html += `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (error) {
+                html += `<div class="test-result error">❌ API 호출 실패: ${error.message}</div>`;
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // 페이지 로드 시 자동 실행
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 1000);
+        });
+    </script>
+</body>
+</html>

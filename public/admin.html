@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 대시보드 - 아이온 포럼</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--dark-secondary);
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-dragon"></i>
+                    <h1>AION FORUM</h1>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html"><i class="fas fa-home"></i> 홈</a></li>
+                        <li><a href="admin.html" class="active"><i class="fas fa-user-shield"></i> 관리자</a></li>
+                        <li><a href="admin-settings.html"><i class="fas fa-cog"></i> 설정</a></li>
+                        <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> 로그아웃</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 관리자 대시보드 -->
+    <main class="main-content">
+        <div class="container">
+            <h2 class="admin-title"><i class="fas fa-tachometer-alt"></i> 관리자 대시보드</h2>
+
+            <!-- 통계 카드 -->
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <i class="fas fa-comments"></i>
+                    <h3>자유게시판</h3>
+                    <p class="stat-number" id="free-count">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3>아이템 거래장터</h3>
+                    <p class="stat-number" id="trade-count">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-store"></i>
+                    <h3>운영자 직거래장터</h3>
+                    <p class="stat-number" id="admin-shop-count">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>거래신청</h3>
+                    <p class="stat-number" id="request-count">0</p>
+                </div>
+                <div class="stat-card" onclick="location.href='admin-members.html'" style="cursor: pointer;">
+                    <i class="fas fa-users"></i>
+                    <h3>전체 회원</h3>
+                    <p class="stat-number" id="member-count">0</p>
+                </div>
+                <div class="stat-card" onclick="location.href='admin-members.html'" style="cursor: pointer;">
+                    <i class="fas fa-user-clock"></i>
+                    <h3>승인 대기</h3>
+                    <p class="stat-number" id="pending-count">0</p>
+                </div>
+            </div>
+
+            <!-- 탭 메뉴 -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="posts"><i class="fas fa-file-alt"></i> 게시글 관리</button>
+                <button class="tab-btn" data-tab="requests"><i class="fas fa-shopping-cart"></i> 거래신청 내역</button>
+                <button class="tab-btn" data-tab="write"><i class="fas fa-pen"></i> 운영자 글쓰기</button>
+                <button class="tab-btn" data-tab="sample"><i class="fas fa-database"></i> 샘플 데이터 생성</button>
+            </div>
+
+            <!-- 게시글 관리 탭 -->
+            <div class="tab-content active" id="posts-tab">
+                <h3><i class="fas fa-file-alt"></i> 게시글 관리</h3>
+                
+                <div class="filter-bar">
+                    <select id="board-filter">
+                        <option value="all">전체 게시판</option>
+                        <option value="free">자유게시판</option>
+                        <option value="trade">아이템 거래장터</option>
+                        <option value="admin_shop">운영자 직판장</option>
+                    </select>
+                    <input type="text" id="post-search" placeholder="검색...">
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>번호</th>
+                                <th>게시판</th>
+                                <th>제목</th>
+                                <th>작성자</th>
+                                <th>작성일</th>
+                                <th>조회수</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-post-list">
+                            <tr>
+                                <td colspan="7" class="loading">게시글을 불러오는 중...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="posts-pagination"></div>
+            </div>
+
+            <!-- 거래신청 내역 탭 -->
+            <div class="tab-content" id="requests-tab">
+                <div class="tab-header-actions">
+                    <h3><i class="fas fa-shopping-cart"></i> 거래신청 내역</h3>
+                    <div class="header-action-btns">
+                        <select id="request-sort-select" class="sort-select" onchange="changeRequestSort()">
+                            <option value="date-desc">날짜순 (최신순)</option>
+                            <option value="date-asc">날짜순 (오래된순)</option>
+                            <option value="name-asc">신청자 이름순 (ㄱ-ㅎ)</option>
+                            <option value="name-desc">신청자 이름순 (ㅎ-ㄱ)</option>
+                        </select>
+                        <button class="btn-delete" onclick="deleteAllTradeRequests()" style="margin-right: 10px;">
+                            <i class="fas fa-trash-alt"></i> 모두 삭제
+                        </button>
+                        <button class="btn-secondary" onclick="openBulkImportModal()">
+                            <i class="fas fa-file-import"></i> 일괄 등록
+                        </button>
+                        <button class="btn-primary" onclick="openAddRequestModal()">
+                            <i class="fas fa-plus"></i> 거래신청 추가
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 140px;">신청일시</th>
+                                <th style="width: 100px;">신청자</th>
+                                <th style="width: 100px;">주민번호</th>
+                                <th style="width: 120px;">아이디</th>
+                                <th style="width: 110px;">판매금액</th>
+                                <th style="width: 110px;">구매금액</th>
+                                <th style="width: 100px;">상태</th>
+                                <th style="width: 150px;">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="request-list">
+                            <tr>
+                                <td colspan="8" class="loading">거래신청 내역을 불러오는 중...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="requests-pagination"></div>
+            </div>
+
+            <!-- 거래신청 수정 모달 -->
+            <div id="edit-request-modal" class="modal">
+                <div class="modal-content" style="max-width: 700px;">
+                    <span class="modal-close" onclick="closeEditRequestModal()">&times;</span>
+                    <h2 class="modal-title"><i class="fas fa-edit"></i> 거래신청 정보 수정</h2>
+                    
+                    <form id="edit-request-form">
+                        <input type="hidden" id="edit-request-id">
+                        
+                        <div class="form-group">
+                            <label for="edit-request-date">신청일시 <span class="required">*</span></label>
+                            <input type="datetime-local" id="edit-request-date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-request-product">상품명 <span class="required">*</span></label>
+                            <input type="text" id="edit-request-product" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-request-name">신청자 이름 <span class="required">*</span></label>
+                            <input type="text" id="edit-request-name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-request-id-number">주민등록번호 <span class="required">*</span></label>
+                            <input type="text" id="edit-request-id-number" required placeholder="예: 901231-1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-request-phone">연락처 <span class="required">*</span></label>
+                            <input type="text" id="edit-request-phone" required placeholder="010-0000-0000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-request-amount">아이디 <span class="required">*</span></label>
+                            <input type="text" id="edit-request-amount" required placeholder="예: dragonknight">
+                            <small class="form-help">게임 캐릭터 아이디</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-request-sell">판매금액 (원)</label>
+                            <input type="number" id="edit-request-sell" placeholder="판매시 금액 입력" min="0">
+                            <small class="form-help">판매 거래인 경우 입력</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-request-buy">구매금액 (원)</label>
+                            <input type="number" id="edit-request-buy" placeholder="구매시 금액 입력" min="0">
+                            <small class="form-help">구매 거래인 경우 입력</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-request-status">진행상태 <span class="required">*</span></label>
+                            <select id="edit-request-status" required>
+                                <option value="pending">대기중</option>
+                                <option value="processing">거래진행중</option>
+                                <option value="completed">거래완료</option>
+                                <option value="cancelled">취소</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="submit" class="btn-primary"><i class="fas fa-check"></i> 저장</button>
+                            <button type="button" class="btn-secondary" onclick="closeEditRequestModal()"><i class="fas fa-times"></i> 취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 거래신청 추가 모달 -->
+            <div id="add-request-modal" class="modal">
+                <div class="modal-content" style="max-width: 700px;">
+                    <span class="modal-close" onclick="closeAddRequestModal()">&times;</span>
+                    <h2 class="modal-title"><i class="fas fa-plus"></i> 거래신청 추가</h2>
+                    
+                    <form id="add-request-form">
+                        <div class="form-group">
+                            <label for="add-request-date">신청일시 <span class="required">*</span></label>
+                            <input type="datetime-local" id="add-request-date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="add-request-product">상품 선택 <span class="required">*</span></label>
+                            <select id="add-request-product" required>
+                                <option value="">상품을 선택하세요</option>
+                            </select>
+                            <small class="form-help">운영자 직판장에 등록된 상품 목록</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="add-request-name">신청자 이름 <span class="required">*</span></label>
+                            <input type="text" id="add-request-name" required placeholder="예: 홍길동">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="add-request-id-number">주민등록번호 <span class="required">*</span></label>
+                            <div class="id-number-input">
+                                <input type="text" id="add-request-id-front" maxlength="6" required placeholder="앞 6자리" pattern="\d{6}">
+                                <span>-</span>
+                                <input type="text" id="add-request-id-back" maxlength="1" required placeholder="뒷자리 첫 1자리" pattern="\d{1}">
+                            </div>
+                            <small class="form-help">예: 901231-1</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="add-request-phone">연락처 <span class="required">*</span></label>
+                            <input type="tel" id="add-request-phone" required placeholder="010-0000-0000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="add-request-amount">아이디 <span class="required">*</span></label>
+                            <input type="text" id="add-request-amount" required placeholder="예: dragonknight">
+                            <small class="form-help">게임 캐릭터 아이디</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="add-request-krw">구매금액 <span class="required">*</span></label>
+                            <input type="number" id="add-request-krw" required placeholder="예: 50000">
+                            <small class="form-help">키나 금액 입력 시 자동 계산됩니다 (수정 가능)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="add-request-status">진행상태 <span class="required">*</span></label>
+                            <select id="add-request-status" required>
+                                <option value="pending">대기중</option>
+                                <option value="processing">거래진행중</option>
+                                <option value="completed">거래완료</option>
+                                <option value="cancelled">취소</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="submit" class="btn-primary"><i class="fas fa-check"></i> 추가</button>
+                            <button type="button" class="btn-secondary" onclick="closeAddRequestModal()"><i class="fas fa-times"></i> 취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 게시글 수정 모달 -->
+            <div id="edit-post-modal" class="modal" style="display: none;">
+                <div class="modal-content" style="max-width: 700px;">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-edit"></i> 게시글 수정</h3>
+                        <button class="modal-close" onclick="closeEditPostModal()">&times;</button>
+                    </div>
+                    <form id="edit-post-form">
+                        <div class="modal-body">
+                            <input type="hidden" id="edit-post-id">
+                            
+                            <div class="form-group">
+                                <label for="edit-post-title">제목 <span class="required">*</span></label>
+                                <input type="text" id="edit-post-title" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit-post-content">내용 <span class="required">*</span></label>
+                                <textarea id="edit-post-content" rows="10" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit-post-created-date">작성일시 <span class="required">*</span></label>
+                                <input type="datetime-local" id="edit-post-created-date" required>
+                                <small class="form-help">게시글의 작성일시를 수정할 수 있습니다.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-secondary" onclick="closeEditPostModal()">취소</button>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> 저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 운영자 글쓰기 탭 -->
+            <div class="tab-content" id="write-tab">
+                <h3><i class="fas fa-pen"></i> 운영자 직판장 글쓰기</h3>
+
+                <form id="admin-write-form">
+                    <div class="form-group">
+                        <label for="admin-title">제목 <span class="required">*</span></label>
+                        <input type="text" id="admin-title" required placeholder="제목을 입력하세요">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admin-item-name">아이템명 <span class="required">*</span></label>
+                        <input type="text" id="admin-item-name" required placeholder="아이템명을 입력하세요">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admin-price">가격 <span class="required">*</span></label>
+                        <input type="text" id="admin-price" required placeholder="가격을 입력하세요">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admin-content">내용 <span class="required">*</span></label>
+                        <textarea id="admin-content" required placeholder="내용을 입력하세요" rows="15"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admin-post-date">작성일 설정 <span class="required">*</span></label>
+                        <input type="datetime-local" id="admin-post-date" required>
+                        <small class="form-help">게시글의 작성일을 직접 설정할 수 있습니다.</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary"><i class="fas fa-check"></i> 등록</button>
+                        <button type="reset" class="btn-secondary"><i class="fas fa-redo"></i> 초기화</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 샘플 데이터 생성 탭 -->
+            <div class="tab-content" id="sample-tab">
+                <h3><i class="fas fa-database"></i> 샘플 데이터 생성</h3>
+
+                <div class="sample-data-info">
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <p>테스트용 샘플 게시글을 자동으로 생성합니다. 2025년 7월부터 현재까지의 날짜로 게시글이 생성됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="sample-data-controls">
+                    <div class="form-group">
+                        <label>게시판 선택</label>
+                        <select id="sample-board-type">
+                            <option value="free">자유게시판</option>
+                            <option value="trade">아이템 거래장터</option>
+                            <option value="admin_shop">운영자 직판장</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>생성할 게시글 수</label>
+                        <input type="number" id="sample-count" min="1" max="100" value="20" placeholder="생성할 게시글 수">
+                        <small class="form-help">한 번에 최대 100개까지 생성 가능합니다.</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-primary" onclick="generateSampleData()">
+                            <i class="fas fa-magic"></i> 샘플 데이터 생성
+                        </button>
+                        <button type="button" class="btn-delete" onclick="clearAllPosts()">
+                            <i class="fas fa-trash-alt"></i> 모든 게시글 삭제
+                        </button>
+                    </div>
+                </div>
+
+                <div id="sample-progress" style="display: none; margin-top: 2rem;">
+                    <div class="progress-info">
+                        <p>생성 중... <span id="progress-text">0/0</span></p>
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 AION FORUM. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 엑셀 일괄 등록 모달 -->
+    <div id="bulk-import-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-excel"></i> 거래신청 일괄 등록</h3>
+                <button class="modal-close" onclick="closeBulkImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-info" style="background: rgba(74, 144, 226, 0.1); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid rgba(74, 144, 226, 0.3);">
+                    <h4 style="margin-bottom: 1rem; color: #4a90e2;"><i class="fas fa-info-circle"></i> 엑셀 파일 형식</h4>
+                    <p style="margin-bottom: 0.5rem; color: var(--text-primary);">엑셀 파일의 첫 번째 행(헤더)은 다음 순서로 작성해주세요:</p>
+                    <div style="background: var(--dark-bg); padding: 1rem; border-radius: 4px; margin-top: 1rem; font-family: monospace; border: 1px solid var(--border-color);">
+                        <strong style="color: #10b981;">신청일시 | 신청자 | 주민번호 | 아이디 | 판매금액 | 구매금액</strong>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                        <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> 
+                        엑셀 파일(.xlsx, .xls) 또는 CSV 파일(.csv)을 업로드할 수 있습니다.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="excel-file">파일 선택</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="excel-file" accept=".xlsx,.xls,.csv" onchange="handleExcelFileSelect(event)" style="display: none;">
+                        <button type="button" class="btn-file-select" onclick="document.getElementById('excel-file').click()">
+                            <i class="fas fa-file-upload"></i> 파일 선택
+                        </button>
+                        <span id="file-name-display" style="margin-left: 1rem; color: #4a90e2;">선택된 파일 없음</span>
+                    </div>
+                </div>
+
+                <div id="excel-preview" style="display: none; margin-top: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;"><i class="fas fa-eye"></i> 미리보기 (처음 5개 데이터)</h4>
+                    <div class="admin-table-container" style="max-height: 300px; overflow-y: auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>신청일시</th>
+                                    <th>신청자</th>
+                                    <th>주민번호</th>
+                                    <th>아이디</th>
+                                    <th>판매금액</th>
+                                    <th>구매금액</th>
+                                </tr>
+                            </thead>
+                            <tbody id="excel-preview-body"></tbody>
+                        </table>
+                    </div>
+                    <p id="excel-count-info" style="margin-top: 1rem; font-weight: bold; color: #007bff;"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeBulkImportModal()">취소</button>
+                <button type="button" class="btn-primary" id="excel-upload-btn" onclick="uploadExcelData()" disabled>
+                    <i class="fas fa-upload"></i> 일괄 등록
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SheetJS 라이브러리 (엑셀 파싱) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/admin-api.js"></script>
+    <script src="/static/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - 아이온 포럼</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .login-container {
+            max-width: 450px;
+            margin: 80px auto;
+            background: var(--dark-secondary);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h2 {
+            color: var(--text-primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.6);
+        }
+        
+        .submit-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+        }
+        
+        .register-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+        
+        .divider span {
+            padding: 0 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" onclick="location.href='index.html'">
+                    <img src="/static/images/aion-logo.jpg" alt="AION" class="logo-image">
+                    <h1>AION FORUM</h1>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html"><i class="fas fa-home"></i> 홈</a></li>
+                        <li><a href="board.html?type=free"><i class="fas fa-comments"></i> 자유게시판</a></li>
+                        <li><a href="board.html?type=trade"><i class="fas fa-exchange-alt"></i> 아이템 거래장터</a></li>
+                        <li><a href="board.html?type=admin_shop"><i class="fas fa-store"></i> 운영자 직거래장터</a></li>
+                        <li><a href="login.html" class="active"><i class="fas fa-sign-in-alt"></i> 로그인</a></li>
+                        <li><a href="register.html"><i class="fas fa-user-plus"></i> 회원가입</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-header">
+                    <h2><i class="fas fa-sign-in-alt"></i> 로그인</h2>
+                    <p>아이온 포럼에 로그인하세요</p>
+                </div>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i> 아이디
+                        </label>
+                        <input type="text" id="username" name="username" required placeholder="아이디를 입력하세요">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> 비밀번호
+                        </label>
+                        <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submit-btn">
+                        <i class="fas fa-sign-in-alt"></i> 로그인
+                    </button>
+                </form>
+                
+                <div class="divider">
+                    <span>또는</span>
+                </div>
+                
+                <div class="register-link">
+                    아직 회원이 아니신가요? <a href="register.html">회원가입하기</a>
+                </div>
+                
+                <div class="register-link" style="margin-top: 10px;">
+                    <a href="admin-login.html" style="color: #ff6b6b;"><i class="fas fa-user-shield"></i> 관리자 로그인</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 AION FORUM. All rights reserved.</p>
+            <p>본 사이트는 게임 아이온 팬 커뮤니티입니다.</p>
+        </div>
+    </footer>
+
+    <!-- 전화 문의 플로팅 버튼 -->
+    <a href="tel:010-2644-3529" class="contact-floating-btn" title="운영자에게 연락하기 (010-2644-3529)">
+        <i class="fas fa-phone-alt"></i>
+    </a>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // 이미 로그인된 경우 홈으로 리다이렉트
+        if (localStorage.getItem('user_id')) {
+            window.location.href = 'index.html';
+        }
+        
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 로그인 중...';
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            try {
+                // 회원 정보 조회
+                const response = await fetch(`tables/members?page=1&limit=1000`);
+                const data = await response.json();
+                
+                const user = data.data.find(member => member.username === username);
+                
+                if (!user) {
+                    showNotification('존재하지 않는 아이디입니다.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 로그인';
+                    return;
+                }
+                
+                // 비밀번호 확인
+                if (user.password !== password) {
+                    showNotification('비밀번호가 일치하지 않습니다.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 로그인';
+                    return;
+                }
+                
+                if (user.status === 'pending') {
+                    showNotification('관리자 승인 대기 중입니다. 승인 후 로그인이 가능합니다.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 로그인';
+                    return;
+                }
+                
+                if (user.status === 'rejected') {
+                    showNotification('가입이 거부된 계정입니다. 관리자에게 문의하세요.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 로그인';
+                    return;
+                }
+                
+                if (user.status !== 'approved') {
+                    showNotification('로그인할 수 없는 계정 상태입니다.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 로그인';
+                    return;
+                }
+                
+                // 로그인 성공
+                localStorage.setItem('user_id', user.id);
+                localStorage.setItem('username', user.username);
+                localStorage.setItem('name', user.name);
+                
+                showNotification(`${user.name}님, 환영합니다!`, 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('로그인 오류:', error);
+                showNotification('로그인 중 오류가 발생했습니다.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 로그인';
+            }
+        });
+    </script>
+</body>
+</html>
