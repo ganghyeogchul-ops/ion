@@ -6,6 +6,70 @@ type Bindings = {
   DB: D1Database;
 }
 
+// Ensure D1 schema exists (Pages deployments do not automatically apply migrations)
+let _schemaReady: Promise<void> | null = null;
+
+async function ensureSchema(db: D1Database): Promise<void> {
+  if (_schemaReady) return _schemaReady;
+  _schemaReady = (async () => {
+    const statements: string[] = [
+      `CREATE TABLE IF NOT EXISTS posts (
+        id TEXT PRIMARY KEY,
+        board_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        author TEXT NOT NULL,
+        item_name TEXT,
+        price TEXT,
+        views INTEGER DEFAULT 0,
+        is_admin INTEGER DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        deleted_at INTEGER
+      )`,
+      `CREATE TABLE IF NOT EXISTS members (
+        id TEXT PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        email TEXT,
+        created_at INTEGER NOT NULL,
+        status TEXT DEFAULT 'active',
+        is_admin INTEGER DEFAULT 0,
+        deleted_at INTEGER
+      )`,
+      `CREATE TABLE IF NOT EXISTS trade_requests (
+        id TEXT PRIMARY KEY,
+        post_id TEXT NOT NULL,
+        post_title TEXT NOT NULL,
+        name TEXT NOT NULL,
+        id_number TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        game_id TEXT NOT NULL,
+        sell_amount INTEGER DEFAULT 0,
+        buy_amount INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'pending',
+        custom_date TEXT,
+        created_at INTEGER NOT NULL,
+        deleted_at INTEGER
+      )`,
+      `CREATE INDEX IF NOT EXISTS idx_posts_board_type ON posts(board_type)`,
+      `CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at)`,
+      `CREATE INDEX IF NOT EXISTS idx_trade_requests_status ON trade_requests(status)`,
+      `CREATE INDEX IF NOT EXISTS idx_trade_requests_created_at ON trade_requests(created_at)`,
+      `CREATE INDEX IF NOT EXISTS idx_trade_requests_custom_date ON trade_requests(custom_date)`,
+      `CREATE INDEX IF NOT EXISTS idx_members_username ON members(username)`,
+      `CREATE INDEX IF NOT EXISTS idx_members_status ON members(status)`
+    ];
+
+    for (const sql of statements) {
+      await db.prepare(sql).run();
+    }
+  })();
+  return _schemaReady;
+}
+
+
+
 const app = new Hono<{ Bindings: Bindings }>()
 
 // Enable CORS for API routes
@@ -28,6 +92,7 @@ function now(): number {
 
 // RESTful Table API - Get all records with pagination
 app.get('/tables/:table', async (c) => {
+  await ensureSchema(env.DB);
   const { env } = c
   const table = c.req.param('table')
   const page = parseInt(c.req.query('page') || '1')
@@ -64,6 +129,7 @@ app.get('/tables/:table', async (c) => {
 
 // RESTful Table API - Get single record
 app.get('/tables/:table/:id', async (c) => {
+  await ensureSchema(env.DB);
   const { env } = c
   const table = c.req.param('table')
   const id = c.req.param('id')
@@ -85,6 +151,7 @@ app.get('/tables/:table/:id', async (c) => {
 
 // RESTful Table API - Create record
 app.post('/tables/:table', async (c) => {
+  await ensureSchema(env.DB);
   const { env } = c
   const table = c.req.param('table')
   const body = await c.req.json()
@@ -149,6 +216,7 @@ app.put('/tables/:table/:id', async (c) => {
 
 // RESTful Table API - Patch (partial update)
 app.patch('/tables/:table/:id', async (c) => {
+  await ensureSchema(env.DB);
   const { env } = c
   const table = c.req.param('table')
   const id = c.req.param('id')
@@ -182,6 +250,7 @@ app.patch('/tables/:table/:id', async (c) => {
 
 // RESTful Table API - Delete (soft delete)
 app.delete('/tables/:table/:id', async (c) => {
+  await ensureSchema(env.DB);
   const { env } = c
   const table = c.req.param('table')
   const id = c.req.param('id')

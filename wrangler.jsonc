@@ -6,7 +6,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "webapp-production",
+      "database_name": "ion",
       "database_id": "755983e0-5ecb-47e9-b68f-1542b99e56f5"
     }
   ]
