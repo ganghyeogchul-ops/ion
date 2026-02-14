@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <style>
         /* 모달 스타일 */
         .modal {
@@ -78,7 +79,6 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
-
 </head>
 <body>
     <!-- 헤더 -->
@@ -151,7 +151,7 @@
             <!-- 게시글 관리 탭 -->
             <div class="tab-content active" id="posts-tab">
                 <h3><i class="fas fa-file-alt"></i> 게시글 관리</h3>
-                
+
                 <div class="filter-bar">
                     <select id="board-filter">
                         <option value="all">전체 게시판</option>
@@ -239,10 +239,10 @@
                 <div class="modal-content" style="max-width: 700px;">
                     <span class="modal-close" onclick="closeEditRequestModal()">&times;</span>
                     <h2 class="modal-title"><i class="fas fa-edit"></i> 거래신청 정보 수정</h2>
-                    
+
                     <form id="edit-request-form">
                         <input type="hidden" id="edit-request-id">
-                        
+
                         <div class="form-group">
                             <label for="edit-request-date">신청일시 <span class="required">*</span></label>
                             <input type="datetime-local" id="edit-request-date" required>
@@ -309,7 +309,7 @@
                 <div class="modal-content" style="max-width: 700px;">
                     <span class="modal-close" onclick="closeAddRequestModal()">&times;</span>
                     <h2 class="modal-title"><i class="fas fa-plus"></i> 거래신청 추가</h2>
-                    
+
                     <form id="add-request-form">
                         <div class="form-group">
                             <label for="add-request-date">신청일시 <span class="required">*</span></label>
@@ -384,7 +384,7 @@
                     <form id="edit-post-form">
                         <div class="modal-body">
                             <input type="hidden" id="edit-post-id">
-                            
+
                             <div class="form-group">
                                 <label for="edit-post-title">제목 <span class="required">*</span></label>
                                 <input type="text" id="edit-post-title" required>
@@ -520,7 +520,7 @@
                         <strong style="color: #10b981;">신청일시 | 신청자 | 주민번호 | 아이디 | 판매금액 | 구매금액</strong>
                     </div>
                     <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
-                        <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> 
+                        <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
                         엑셀 파일(.xlsx, .xls) 또는 CSV 파일(.csv)을 업로드할 수 있습니다.
                     </p>
                 </div>
@@ -565,11 +565,13 @@
         </div>
     </div>
 
+    <!-- ✅ 변경 포인트: 캐시 무시 + 실행 순서 보장 -->
     <!-- SheetJS 라이브러리 (엑셀 파싱) -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    <script src="/static/js/main.js"></script>
-    <script src="/static/js/admin-api.js"></script>
-    <script src="/static/js/admin.js"></script>
+    <!-- v= 값은 아무거나 바꿔도 됨 (수정할 때마다 값 바꾸면 무조건 최신 JS 로딩됨) -->
+    <script defer src="/static/js/main.js?v=20260215_01"></script>
+    <script defer src="/static/js/admin-api.js?v=20260215_01"></script>
+    <script defer src="/static/js/admin.js?v=20260215_01"></script>
 </body>
 </html>
